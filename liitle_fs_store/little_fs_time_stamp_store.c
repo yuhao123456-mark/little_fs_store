@@ -11,6 +11,7 @@
 #include "little_fs_time_stamp_store.h"
 #include "lfs.h"
 #include "lfs_util.h"
+#include <tchar.h>
 
 #define INVAILD_FILE 0
 #define CURRENT_PATH "新建文本文档.txt"
@@ -75,14 +76,40 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_save(char const *na
     }
 
     lfs_file_seek(&lfs, &file, 0, LFS_SEEK_END);
+    int buff_size = lfs_file_tell(&lfs, &file);
+    if (buff_size <= 0)
+    {
+        printf("warn:content is empty");
+        goto RETURNED;
+    }
 
     err = lfs_file_write(&lfs, &file, buff, buff_len);
     if (err < 0)
     {
         printf("error:Failed to write the file");
-        return Little_fs_time_stamp_store_result_unknown_error;
+        goto RETURNED;
     }
 
+    char time[10];
+    sprintf(time, "%d ", time_stamp);
+    err = lfs_file_write(&lfs, &file, time, 10);
+    {
+        printf("error:Failed to write the file");
+        goto RETURNED;
+    }
+
+    int len = strlen(time);
+    for (int i = 0; i < buff_size; i++)
+    {
+        if (0 == strnicmp(buff + i, time, len))
+        {
+            for (int j = buff_size - i; j > 0; j--)
+            {
+            }
+        }
+    }
+
+RETURNED:
     lfs_file_close(&lfs, &file);
 
     lfs_unmount(&lfs);
