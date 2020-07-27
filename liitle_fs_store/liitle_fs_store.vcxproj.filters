@@ -13,10 +13,38 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="配置文件">
+      <UniqueIdentifier>{a1dbe065-f62d-4c9b-b3a5-672be6a8f952}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="liitle_fs_store.cpp">
+    <ClCompile Include="lfs.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="lfs_util.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="little_fs_time_stamp_store.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="liitle_fs_store.c">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="little_fs_time_stamp_store.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="lfs.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="lfs_util.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include=".clang-format">
+      <Filter>配置文件</Filter>
+    </None>
   </ItemGroup>
 </Project>

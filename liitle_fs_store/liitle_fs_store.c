@@ -1,10 +1,32 @@
 ﻿// liitle_fs_store.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
 
+#include "little_fs_time_stamp_store.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 int main()
 {
+    srand((unsigned)time(NULL));
+    char name[5] = {"yuhao"};
+    char buff[100] = {0};
+    int count = rand() % 100;
+    for (int i = 0; i < count; i++)
+    {
+        // if (i < 4)
+        //{
+        //    *(name + i) = rand() % 12 + 65;
+        //}
+        *(buff + i) = rand() % 12 + 65;
+    }
+
+    little_fs_time_stamp_store_save(name, rand() % 100, buff, count);
+
+    little_fs_time_stamp_store_read(name, rand() % 100, buff, count);
+    printf("%s", buff);
+
+    return 0;
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单

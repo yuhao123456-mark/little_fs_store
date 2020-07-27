@@ -1,0 +1,12 @@
+﻿  little_fs_time_stamp_store.c
+D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(29,1): warning C4113: “int (__cdecl *)()”和“int (__cdecl *)(const lfs_config *)”的参数列表不同
+D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(123,49): warning C4090: “函数”: 不同的“const”限定符
+D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(154,15): warning C4018: “<”: 有符号/无符号不匹配
+D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(162,9): warning C4102: “RETURNED”: 未引用的标签
+D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(182,15): warning C4018: “<”: 有符号/无符号不匹配
+D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(187,9): warning C4102: “RETURNED”: 未引用的标签
+D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(237,23): warning C4018: “<”: 有符号/无符号不匹配
+D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(243,20): warning C4552: ”-“: 未使用表达式结果
+  liitle_fs_store.vcxproj -> D:\核桃\项目文件\2020.7.27\liitle_fs_store\Debug\liitle_fs_store.exe
