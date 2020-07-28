@@ -14,7 +14,7 @@
 #include <tchar.h>
 
 #define INVAILD_FILE 0
-#define CURRENT_PATH "新建文本文档.txt"
+#define CURRENT_PATH "New_document.txt"
 #define BUFF_SIZE 255
 
 lfs_t lfs;
@@ -112,9 +112,9 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_read(char const *na
         lfs_mount(&lfs, &cfg);
     }
 
-    char write[64] = {0};
-    sprintf(write, "%s+%u", name, time_stamp);
-    err = lfs_file_open(&lfs, &file, write, LFS_O_RDWR);
+    char read[64] = {0};
+    sprintf(read, "%s+%u", name, time_stamp);
+    err = lfs_file_open(&lfs, &file, read, LFS_O_RDWR);
     if (err < 0)
     {
         printf("error:Failed to open the file%d\n", err);
@@ -141,6 +141,72 @@ RETURNED:
 
 Little_fs_time_stamp_store_result little_fs_time_stamp_store_load(char const *name, uint32_t start_time, uint8_t const *buff, uint32_t buff_len)
 {
+
+    struct lfs_info li = {
+        .type = 0,
+        .size = 0,
+        .name = {0},
+    };
+
+    Little_fs_time_stamp_store_result result = Little_fs_time_stamp_store_result_success;
+
+    int err = lfs_dir_open(&lfs, &dir, "");
+    if (err)
+    {
+        printf("error:failed to open the dir%d", err);
+        result = Little_fs_time_stamp_store_result_unknown_error;
+        goto RETURNED;
+    }
+
+    uint32_t time_stamp_count[30] = {0};
+    int count = 0;
+    err = 1;
+    while (err != 0)
+    {
+        err = lfs_dir_read(&lfs, &dir, &li);
+        if (err < 0)
+        {
+            printf("error:failed to read the dir%d", err);
+            result = Little_fs_time_stamp_store_result_unknown_error;
+            goto RETURNED;
+        }
+
+        if (li.name != NULL && li.size == 0 || li.name == NULL && li.size == 0)
+        {
+            continue;
+        }
+        else if (li.name != NULL && li.size != 0)
+        {
+            int len = strlen(li.name);
+            if (strnicmp(name, li.name, strlen(name) == 0))
+            {
+                for (int i = 0; i < len; i++)
+                {
+                    if (li.name[i] == '+')
+                    {
+                        time_stamp_count[count++] = atoi(li.name + (i + 1));
+                    }
+                }
+                if (count > 30)
+                {
+                    break;
+                }
+            }
+        }
+    }
+
+    qsort(time_stamp_count, 30, sizeof(time_stamp_count[0]), compar);
+
+RETURNED:
+
+    lfs_dir_close(&lfs, &dir);
+
+    return result;
+}
+
+int compar(const void *p1, const void *p2)
+{
+    return p1 > p2;
 }
 
 //读文件
@@ -159,16 +225,13 @@ int user_provided_block_device_read(const struct lfs_config *c, lfs_block_t bloc
 
     fseek(file, c->block_size * block + off, SEEK_SET); //偏移量设c->block_size*c->block_count
 
-    int count = fread(buffer, 1, size, file); //从c->block_size*c->block_count的偏移量读取c->block_size*c->block_count字节
+    uint32_t count = fread(buffer, 1, size, file); //从c->block_size*c->block_count的偏移量读取c->block_size*c->block_count字节
     if (count < size)
     {
         printf("error:Failed to read file");
         result = -1;
     }
 
-    // printf(buffer);
-
-RETURNED:
     fclose(file);
 
     return result;
@@ -187,13 +250,13 @@ int user_provided_block_device_prog(const struct lfs_config *c, lfs_block_t bloc
     FILE *const file = fopen(CURRENT_PATH, "rb+"); // ab+ 打开或新建一个二进制文件，可以读，但只允许在文件末尾追写
 
     fseek(file, c->block_size * block + off, SEEK_SET); //偏移量设c->block_size*c->block_count
-    int count = fwrite(buffer, 1, size, file);          //从c->block_size*c->block_count的偏移量读取c->block_size*c->block_count字节
+    uint32_t count = fwrite(buffer, 1, size, file);     //从c->block_size*c->block_count的偏移量读取c->block_size*c->block_count字节
     if (count < size)
     {
         printf("error:Failed to read file");
         result = -1;
     }
-RETURNED:
+
     fclose(file);
     if (result == 0)
     {
@@ -243,7 +306,7 @@ int create_file(const struct lfs_config *c)
 
     uint8_t const erase_char = 0xff;
     int write_result = 0;
-    for (int i = 0; i < c->block_count * c->block_size; i++)
+    for (uint32_t i = 0; i < c->block_count * c->block_size; i++)
     {
         write_result = fwrite(&erase_char, 1, 1, file);
         if (write_result < 0)

@@ -25,7 +25,7 @@ int main()
     }
     little_fs_time_stamp_store_save(name, time_stamp[0], buff, count);
     little_fs_time_stamp_store_read(name, time_stamp[0], buff, count);
-
+    little_fs_time_stamp_store_load(name, time_stamp[0], buff, count);
     return 0;
 }
 
