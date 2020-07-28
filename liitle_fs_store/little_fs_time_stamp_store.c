@@ -19,6 +19,7 @@
 
 lfs_t lfs;
 lfs_file_t file;
+lfs_dir_t dir;
 
 int user_provided_block_device_read(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size);
 int user_provided_block_device_prog(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, const void *buffer, lfs_size_t size);
@@ -54,7 +55,7 @@ const struct lfs_config cfg = {
  */
 Little_fs_time_stamp_store_result little_fs_time_stamp_store_save(char const *name, uint32_t time_stamp, uint8_t const *buff, uint32_t buff_len)
 {
-
+    Little_fs_time_stamp_store_result result = Little_fs_time_stamp_store_result_success;
     int err = lfs_mount(&lfs, &cfg);
 
     if (err)
@@ -63,58 +64,33 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_save(char const *na
         lfs_mount(&lfs, &cfg);
     }
 
-    uint32_t boot_count = 0;
-    err = lfs_file_open(&lfs, &file, name, LFS_O_RDWR | LFS_O_CREAT);
+    char write[64] = {0};
+    sprintf(write, "%s+%u", name, time_stamp);
+    err = lfs_file_open(&lfs, &file, write, LFS_O_RDWR | LFS_O_CREAT);
     if (err < 0)
     {
-        err = lfs_file_open(&lfs, &file, name, LFS_O_RDWR | LFS_O_CREAT);
-        if (err < 0)
-        {
-            printf("error:Failed to open the file");
-            return Little_fs_time_stamp_store_result_unknown_error;
-        }
+        printf("error:Failed to open the file%d\n", err);
+        result = Little_fs_time_stamp_store_result_unknown_error;
+        goto RETURNED;
     }
 
     lfs_file_seek(&lfs, &file, 0, LFS_SEEK_END);
-    int buff_size = lfs_file_tell(&lfs, &file);
-    if (buff_size <= 0)
-    {
-        printf("warn:content is empty");
-        goto RETURNED;
-    }
 
     err = lfs_file_write(&lfs, &file, buff, buff_len);
     if (err < 0)
     {
-        printf("error:Failed to write the file");
-        goto RETURNED;
-    }
+        printf("error:Failed to write the file%d\n", err);
 
-    char time[10];
-    sprintf(time, "%d ", time_stamp);
-    err = lfs_file_write(&lfs, &file, time, 10);
-    {
-        printf("error:Failed to write the file");
-        goto RETURNED;
-    }
-
-    int len = strlen(time);
-    for (int i = 0; i < buff_size; i++)
-    {
-        if (0 == strnicmp(buff + i, time, len))
-        {
-            for (int j = buff_size - i; j > 0; j--)
-            {
-            }
-        }
+        result = Little_fs_time_stamp_store_result_unknown_error;
     }
 
 RETURNED:
+
     lfs_file_close(&lfs, &file);
 
     lfs_unmount(&lfs);
 
-    return Little_fs_time_stamp_store_result_success;
+    return result;
 }
 
 /**
@@ -127,6 +103,8 @@ RETURNED:
  */
 Little_fs_time_stamp_store_result little_fs_time_stamp_store_read(char const *name, uint32_t time_stamp, uint8_t const *buff, uint32_t buff_len)
 {
+    Little_fs_time_stamp_store_result result = Little_fs_time_stamp_store_result_success;
+
     int err = lfs_mount(&lfs, &cfg);
     if (err)
     {
@@ -134,31 +112,35 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_read(char const *na
         lfs_mount(&lfs, &cfg);
     }
 
-    err = lfs_file_open(&lfs, &file, name, LFS_O_RDWR | LFS_O_CREAT);
+    char write[64] = {0};
+    sprintf(write, "%s+%u", name, time_stamp);
+    err = lfs_file_open(&lfs, &file, write, LFS_O_RDWR);
     if (err < 0)
     {
-        err = lfs_file_open(&lfs, &file, name, LFS_O_RDWR | LFS_O_CREAT);
-        if (err < 0)
-        {
-            printf("error:Failed to open the file");
-            return Little_fs_time_stamp_store_result_unknown_error;
-        }
+        printf("error:Failed to open the file%d\n", err);
+        result = Little_fs_time_stamp_store_result_unknown_error;
+        goto RETURNED;
     }
 
     lfs_file_seek(&lfs, &file, 0, LFS_SEEK_SET);
 
-    int count = lfs_file_read(&lfs, &file, &buff, buff_len);
+    int count = lfs_file_read(&lfs, &file, buff, buff_len);
     if (count < 0)
     {
-        printf("error:Failed to read the file");
-        return Little_fs_time_stamp_store_result_unknown_error;
+        printf("error:Failed to read the file%d\n", err);
+        result = Little_fs_time_stamp_store_result_unknown_error;
     }
 
+RETURNED:
     lfs_file_close(&lfs, &file);
 
     lfs_unmount(&lfs);
 
-    return Little_fs_time_stamp_store_result_success;
+    return result;
+}
+
+Little_fs_time_stamp_store_result little_fs_time_stamp_store_load(char const *name, uint32_t start_time, uint8_t const *buff, uint32_t buff_len)
+{
 }
 
 //读文件

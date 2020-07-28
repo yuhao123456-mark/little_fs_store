@@ -9,22 +9,22 @@
 int main()
 {
     srand((unsigned)time(NULL));
-    char name[5] = {"yuhao"};
+    char name[6] = {"yuhao"};
     char buff[100] = {0};
     int count = rand() % 100;
-    for (int i = 0; i < count; i++)
+
+    memset(buff, 0, 100);
+    uint32_t time_stamp[100] = {0};
+    for (int j = 0; j < 10; j++)
     {
-        // if (i < 4)
-        //{
-        //    *(name + i) = rand() % 12 + 65;
-        //}
-        *(buff + i) = rand() % 12 + 65;
+        for (int i = 0; i < count; i++)
+        {
+            *(buff + i) = rand() % 12 + 65;
+        }
+        time_stamp[j] = rand() % 100;
     }
-
-    little_fs_time_stamp_store_save(name, rand() % 100, buff, count);
-
-    little_fs_time_stamp_store_read(name, rand() % 100, buff, count);
-    printf("%s", buff);
+    little_fs_time_stamp_store_save(name, time_stamp[0], buff, count);
+    little_fs_time_stamp_store_read(name, time_stamp[0], buff, count);
 
     return 0;
 }

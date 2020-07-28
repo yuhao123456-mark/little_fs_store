@@ -34,3 +34,5 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_save(char const *na
  * @param buff_len[int] buff长度
  */
 Little_fs_time_stamp_store_result little_fs_time_stamp_store_read(char const *name, uint32_t time_stamp, uint8_t const *buff, uint32_t buff_len);
+
+Little_fs_time_stamp_store_result little_fs_time_stamp_store_load(char const *name, uint32_t start_time, uint8_t const *buff, uint32_t buff_len);
