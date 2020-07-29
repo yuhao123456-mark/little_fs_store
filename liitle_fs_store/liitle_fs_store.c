@@ -9,11 +9,11 @@
 int main()
 {
     srand((unsigned)time(NULL));
-    char name[6] = {"yuhao"};
-    char buff[100] = {0};
-    int count = rand() % 100;
 
-    memset(buff, 0, 100);
+    char buff[1024] = {0};
+    int count = rand() % 100;
+    char name[6] = {"yuhao"};
+    memset(buff, 0, 1024);
     uint32_t time_stamp[100] = {0};
     for (int j = 0; j < 10; j++)
     {
@@ -21,11 +21,12 @@ int main()
         {
             *(buff + i) = rand() % 12 + 65;
         }
-        time_stamp[j] = rand() % 100;
+        time_stamp[j] = rand() % 1000;
     }
+
     little_fs_time_stamp_store_save(name, time_stamp[0], buff, count);
     little_fs_time_stamp_store_read(name, time_stamp[0], buff, count);
-    little_fs_time_stamp_store_load(name, time_stamp[0], buff, count);
+    little_fs_time_stamp_store_load(name, time_stamp[0], buff, 1024);
     return 0;
 }
 

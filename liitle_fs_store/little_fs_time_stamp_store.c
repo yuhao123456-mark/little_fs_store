@@ -28,6 +28,10 @@ int user_provided_block_device_sync();
 bool is_binary_exist(void);
 int create_file(const struct lfs_config *c);
 
+int compar(const void *p1, const void *p2);
+// int readfile(char *const name, uint32_t time_stamp, uint8_t const *buff);
+int writefile(char const *name, uint32_t time_stamp, uint8_t const *buff, uint32_t buff_len);
+
 const struct lfs_config cfg = {
     // block device operations
     .read = user_provided_block_device_read,
@@ -66,6 +70,7 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_save(char const *na
 
     char write[64] = {0};
     sprintf(write, "%s+%u", name, time_stamp);
+    printf("%s\n", write);
     err = lfs_file_open(&lfs, &file, write, LFS_O_RDWR | LFS_O_CREAT);
     if (err < 0)
     {
@@ -114,6 +119,7 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_read(char const *na
 
     char read[64] = {0};
     sprintf(read, "%s+%u", name, time_stamp);
+    printf("%s\n\n", read);
     err = lfs_file_open(&lfs, &file, read, LFS_O_RDWR);
     if (err < 0)
     {
@@ -141,12 +147,8 @@ RETURNED:
 
 Little_fs_time_stamp_store_result little_fs_time_stamp_store_load(char const *name, uint32_t start_time, uint8_t const *buff, uint32_t buff_len)
 {
-
-    struct lfs_info li = {
-        .type = 0,
-        .size = 0,
-        .name = {0},
-    };
+    memset(buff, 0, buff_len);
+    struct lfs_info li = {0};
 
     Little_fs_time_stamp_store_result result = Little_fs_time_stamp_store_result_success;
 
@@ -154,14 +156,13 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_load(char const *na
     if (err)
     {
         printf("error:failed to open the dir%d", err);
-        result = Little_fs_time_stamp_store_result_unknown_error;
-        goto RETURNED;
+        return Little_fs_time_stamp_store_result_unknown_error;
     }
 
     uint32_t time_stamp_count[30] = {0};
     int count = 0;
-    err = 1;
-    while (err != 0)
+
+    do
     {
         err = lfs_dir_read(&lfs, &dir, &li);
         if (err < 0)
@@ -171,31 +172,69 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_load(char const *na
             goto RETURNED;
         }
 
-        if (li.name != NULL && li.size == 0 || li.name == NULL && li.size == 0)
+        if (strlen(li.name) != 0 && li.size == 0 || strlen(li.name) && li.size == 0)
         {
             continue;
         }
-        else if (li.name != NULL && li.size != 0)
+        else if (strlen(li.name) != 0 && li.size != 0)
         {
             int len = strlen(li.name);
-            if (strnicmp(name, li.name, strlen(name) == 0))
+            if (strncmp(name, li.name, strlen(name)) == 0)
             {
+
                 for (int i = 0; i < len; i++)
                 {
+
                     if (li.name[i] == '+')
                     {
-                        time_stamp_count[count++] = atoi(li.name + (i + 1));
+                        int time_stamp = 0;
+                        sscanf(li.name + (i + 1), "%d", &time_stamp);
+                        if (count >= 29)
+                        {
+                            qsort(time_stamp_count, 30, sizeof(int), compar);
+                            if (time_stamp_count[0] > time_stamp && start_time < time_stamp)
+                            {
+                                time_stamp_count[count] = time_stamp;
+                            }
+                            continue;
+                        }
+                        if (start_time < time_stamp)
+                        {
+                            time_stamp_count[count] = time_stamp;
+                            count++;
+                        }
                     }
-                }
-                if (count > 30)
-                {
-                    break;
                 }
             }
         }
+        printf(li.name);
+        printf(" %d\n", li.size);
+    } while (err != 0);
+
+    for (int i = 0; i <= 29; i++)
+    {
+        printf("%d\n", time_stamp_count[i]);
     }
 
-    qsort(time_stamp_count, 30, sizeof(time_stamp_count[0]), compar);
+    int buffer_len = 0;
+    int len = 1024;
+    for (int i = 0; i < 30; i++)
+    {
+        if (time_stamp_count[i] == 0)
+        {
+            continue;
+        }
+
+        buffer_len += readfile(name, time_stamp_count[i], buff + buffer_len, len - 1);
+        len = 1024 - buffer_len;
+        if (buffer_len == 1023 || buffer_len < 0)
+        {
+            printf("error:The file does not exist or the file is empty");
+            break;
+        }
+    }
+
+    printf("%s", buff);
 
 RETURNED:
 
@@ -206,7 +245,99 @@ RETURNED:
 
 int compar(const void *p1, const void *p2)
 {
-    return p1 > p2;
+    return (*(int *)p2 - *(int *)p1);
+}
+
+int readfile(char *const name, uint32_t time_stamp, uint8_t const *buff, uint32_t buff_len)
+{
+    int result = 0;
+    int err = lfs_mount(&lfs, &cfg);
+    if (err)
+    {
+        lfs_format(&lfs, &cfg);
+        lfs_mount(&lfs, &cfg);
+    }
+
+    char read[64] = {0};
+    sprintf(read, "%s+%u", name, time_stamp);
+
+    int len = strlen(read);
+    strncpy(buff, read, len);
+    buff_len -= len;
+
+    err = lfs_file_open(&lfs, &file, read, LFS_O_RDWR);
+    if (err < 0)
+    {
+        printf("error:failed to open the file%d", err);
+        return -1;
+    }
+
+    lfs_file_seek(&lfs, &file, 0, LFS_SEEK_END);
+    int max_size = lfs_file_tell(&lfs, &file);
+    lfs_file_seek(&lfs, &file, 0, LFS_SEEK_SET);
+
+    err = lfs_file_read(&lfs, &file, buff + len, buff_len);
+    if (err < 0)
+    {
+        printf("error:failed to open the file%d", err);
+        result = -1;
+    }
+
+    result = err + len;
+
+    lfs_file_close(&lfs, &file);
+    lfs_unmount(&lfs);
+
+    return result;
+}
+
+int writefile(char const *name, uint32_t time_stamp, uint8_t const *buff, uint32_t buff_len)
+{
+    int result = 0;
+    int err = lfs_mount(&lfs, &cfg);
+
+    if (err)
+    {
+        lfs_format(&lfs, &cfg);
+        lfs_mount(&lfs, &cfg);
+    }
+
+    err = lfs_file_open(&lfs, &file, name, LFS_O_RDWR | LFS_O_CREAT);
+    if (err < 0)
+    {
+        printf("error:Failed to open the file%d\n", err);
+        result = -1;
+        goto RETURNED;
+    }
+
+    lfs_file_seek(&lfs, &file, 0, LFS_SEEK_END);
+    char write[64] = {0};
+    sprintf(write, "%s+%u", name, time_stamp);
+    err = lfs_file_write(&lfs, &file, write, buff_len);
+    if (err < 0)
+    {
+        printf("error:Failed to write the file%d\n", err);
+
+        result = -1;
+    }
+
+    lfs_file_seek(&lfs, &file, 0, LFS_SEEK_END);
+
+    err = lfs_file_write(&lfs, &file, buff, buff_len);
+    if (err < 0)
+    {
+        printf("error:Failed to write the file%d\n", err);
+
+        result = -1;
+    }
+
+RETURNED:
+
+    lfs_file_close(&lfs, &file);
+
+    lfs_unmount(&lfs);
+
+    return result;
 }
 
 //读文件
