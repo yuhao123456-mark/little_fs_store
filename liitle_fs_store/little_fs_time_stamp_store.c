@@ -217,7 +217,7 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_load(char const *na
     }
 
     int buffer_len = 0;
-    int len = 1024;
+    int len = buff_len;
     for (int i = 0; i < 30; i++)
     {
         if (time_stamp_count[i] == 0)
@@ -226,8 +226,8 @@ Little_fs_time_stamp_store_result little_fs_time_stamp_store_load(char const *na
         }
 
         buffer_len += readfile(name, time_stamp_count[i], buff + buffer_len, len - 1);
-        len = 1024 - buffer_len;
-        if (buffer_len == 1023 || buffer_len < 0)
+        len = buff_len - buffer_len;
+        if (buffer_len == buff_len - 1 || buffer_len < 0 || len < 10)
         {
             printf("error:The file does not exist or the file is empty");
             break;

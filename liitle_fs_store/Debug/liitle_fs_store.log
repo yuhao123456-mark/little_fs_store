@@ -1,10 +1,4 @@
-﻿  lfs.c
-D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\lfs.c(1090,36): warning C4244: “=”: 从“uint16_t”转换到“uint8_t”，可能丢失数据
-  lfs_util.c
-  liitle_fs_store.c
-D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
-D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\liitle_fs_store.c(16,11): warning C4013: “memset”未定义；假设外部返回 int
-  little_fs_time_stamp_store.c
+﻿  little_fs_time_stamp_store.c
 D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
 D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
 D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(35,1): warning C4113: “int (__cdecl *)()”和“int (__cdecl *)(const lfs_config *)”的参数列表不同
@@ -17,5 +11,4 @@ D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_
 D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(265,17): warning C4090: “函数”: 不同的“const”限定符
 D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(279,48): warning C4090: “函数”: 不同的“const”限定符
 D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c(446,20): warning C4552: ”-“: 未使用表达式结果
-  正在生成代码...
-D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\little_fs_time_stamp_store.c : fatal error C1090: PDB API 调用失败，错误代码“3”: D:\核桃\项目文件\2020.7.27\liitle_fs_store\liitle_fs_store\Debug\vc142.pdb
+  liitle_fs_store.vcxproj -> D:\核桃\项目文件\2020.7.27\liitle_fs_store\Debug\liitle_fs_store.exe
